@@ -40,7 +40,7 @@ function postTodo(event) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'http://localhost:3000/todos');
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = handleData;
+    xhr.onload = postData;
     xhr.send(jsonnedTodo);
 }
 
@@ -56,7 +56,6 @@ function markComplete(element) {
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', `http://localhost:3000/todos/${clickedID}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = handleData;
     xhr.send(jsonnedTodo);
 }
 
@@ -72,13 +71,11 @@ function markIncomplete(element){
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', `http://localhost:3000/todos/${clickedID}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = handleData;
     xhr.send(jsonnedTodo);
 }
 
 
 function handleData(event) {
-    event.preventDefault();
     const todos = JSON.parse(event.target.responseText);
     const todoList = document.querySelector('.todo-list');
 
@@ -96,7 +93,21 @@ function handleData(event) {
     }
 }
 
+function postData(event) {
+    const todo = JSON.parse(event.target.responseText);
+    const todoList = document.querySelector('.todo-list');
+    let todoItem = document.createElement('li');
+    todoItem.innerText = todo.text;
+    todoItem.id = todo.id;
+    if (todo.completed){
+        todoItem.style.textDecoration = 'line-through';
+    } else {
+        todoItem.style.textDecoration = '';
+    }
+    todoItem.addEventListener('click', toggleDone);
+    todoList.appendChild(todoItem);
 
+}
 
 function toggleDone(event){
     const clickedElement = event.target;
@@ -121,10 +132,18 @@ function deleteCompleted(event){
             const xhr = new XMLHttpRequest();
             xhr.open('DELETE', `http://localhost:3000/todos/${deleteIndex}`);
             xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = handleData;
             xhr.send();
         }
     }
+    clearList();
+    setDefault();
 
     
+}
+
+function clearList(){
+    const todoList = document.querySelector('.todo-list');
+    while(todoList.hasChildNodes()){
+        todoList.removeChild(todoList.firstChild);
+    }
 }
